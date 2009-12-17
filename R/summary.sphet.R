@@ -1,8 +1,8 @@
-summary.sphet<-function(object,...){
+summary.sphet<-function(object, width=getOption("width"),digits=getOption("digits"),obsinfo=FALSE,...){
 
 	if(inherits(object,"distance")){
-		weights<-	object$weights
-		neighbors<- object$neigh
+		weights<-	attributes(object)$GeoDa$dist
+		neighbors<- object
 		n<- length(weights)
 		maxdist<-unlist(lapply(weights,max))
 		nneigh<-unlist(lapply(weights,length))
@@ -30,18 +30,22 @@ else colnames(CoefTable) <- c("Estimate","Std. Error","t-value","Pr(>|t|)")
 	object
 	}
 	
-	print.summary.sphet <- function(x,digits= max(3, getOption("digits") - 2),width=getOption("width"),...){
+	print.summary.sphet <- function(x,digits= max(3, getOption("digits") - 2),width=getOption("width"),obsinfo=FALSE,...){
 if(inherits(x,"distance")){
 	cat("\n Number of observations:\n")
 	cat(" n:", x$n, "\n")
+if (obsinfo){
 	cat("\n Maximum distance for each observation:\n") 
-	cat( x$maxdist, "\n")
+	cat(x$maxdist,  fill=TRUE)
+	}
 	cat("\n Distance summary:\n")
-	print(summary(x$maxdist))
+	print(summary(x$maxdist), width=width)
+if (obsinfo){	
 	cat("\n Number of non-zero elements for each observation:\n")
-	cat( x$nneigh, "\n")
+	cat( x$nneigh, fill=TRUE)
+	}
 	cat("\n Neighbors summary:\n")	
-	print(summary(x$nneigh))
+	print(summary(x$nneigh), width=width)
 	}
 			
 			else{
@@ -85,7 +89,7 @@ sumres <- function(x){
 }
 
 
-print.sphet <- function(x, digits = max(3, getOption("digits") - 3), ...) 
+print.sphet <- function(x, digits = max(3, getOption("digits") - 3),...) 
 {
 	if(inherits(x,"distance")){ 
 		tmp<-summary.sphet(x)

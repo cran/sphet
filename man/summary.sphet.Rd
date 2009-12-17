@@ -9,11 +9,14 @@ Method used to print objects of class \code{'summary.sphet'} and \code{'sphet'}
 }
 
 \usage{
-\method{summary}{sphet}(object,...)
+\method{summary}{sphet}(object,width=getOption("width"), digits=getOption("digits"),obsinfo=FALSE,...)
 }
 
 \arguments{
 \item{object}{an object of class 'sphet'}
+\item{width}{controls the maximum number of columns on a line used in printing}
+\item{digits}{minimal number of significant digits, see \code{print.default}}
+\item{obsinfo}{for objects of class \code{distance}: if \code{TRUE} prints observation-wise information}
 \item{...}{additional arguments to be passed}
 }
 

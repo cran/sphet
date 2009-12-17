@@ -1,14 +1,5 @@
 \name{gstslshet}
 \alias{gstslshet}
-\alias{fistslsfast}
-\alias{fistslserror}
-\alias{fifour}
-\alias{fierror}
-\alias{Ggfastfast}
-\alias{arg}
-\alias{arg1}
-\alias{Omega}
-\alias{Omegabis}
 
 
 

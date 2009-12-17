@@ -65,7 +65,16 @@ else 	n<-length(unique(region.id))
             res[[i]] <- as.integer(0)
         }
     }
-    result<-list(neigh=res, weights=weights)
-    class(result)<-c("sphet","distance")
+#    result<-list(neigh=res, weights=weights)
+    result<-res
+    class(result)<-c("sphet","distance","nb", "GWT")##modified 03/11/2010
+    
+    attr(result, "region.id") <- region.id
+    attr(result, "neighbours.attrs") <- as.character(NA)
+    attr(result, "weights.attrs") <- as.character(NA)
+    attr(result, "GeoDa") <- list(dist = weights, shpfile = shpfile, 
+        ind = ind)
+    attr(result, "call") <- match.call()
+    attr(result, "n") <- n
     return(result)
 	}

@@ -1,4 +1,4 @@
-stslshac<-function(formula, data=list(),listw,na.action=na.fail,zero.policy=FALSE,HAC=TRUE, distance=NULL,type=c("Epanechnikov","Triangular","Bisquare","Parzen", "QS","TH"), bandwidth="variable"){
+stslshac<-function(formula, data=list(),listw,na.action=na.fail,zero.policy=FALSE,HAC=TRUE, distance=NULL,type=c("Epanechnikov","Triangular","Bisquare","Parzen", "QS","TH"), bandwidth="variable",W2X=TRUE){
 
 ##functions that need to be sourced
 	#source("twostagels.R")
@@ -72,7 +72,7 @@ if (k > 1) {
         WWX <- matrix(nrow = n, ncol = (k  - (K - 1)))
         for (i in K:k) {
             wx <- lag.listw(listw, x[, i], zero.policy = zero.policy)
-            wwx<- lag.listw(listw, wx, zero.policy = zero.policy)
+if(W2X)      wwx<- lag.listw(listw, wx, zero.policy = zero.policy)
             if (any(is.na(wx))) 
                 stop("NAs in lagged independent variable")
             WX[, (i - (K - 1))] <- wx

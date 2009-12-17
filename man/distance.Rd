@@ -7,8 +7,11 @@
 }
 
 \usage{
-distance(coord,region.id=NULL,output=TRUE,type=c("NN","distance","inverse"),nn=6, 
-cutoff=FALSE, shape.name=NULL,region.id.name=NULL,firstline=FALSE,file.name=NULL)
+distance(coord,region.id=NULL,output=TRUE,
+type=c("NN","distance","inverse"),
+measure=c("euclidean","gcircle","chebyshev","braycur","canberra"),
+nn=6, cutoff=FALSE, miles=TRUE,R=NULL, shape.name=NULL,region.id.name=NULL,
+firstline=FALSE,file.name=NULL)
 }
 
 \arguments{
@@ -17,10 +20,13 @@ cutoff=FALSE, shape.name=NULL,region.id.name=NULL,firstline=FALSE,file.name=NULL
   \item{region.id}{variable that defines the ordering of the observations}
   \item{output}{when TRUE (default) writes the object to a file}
   \item{type}{one of \code{("NN","distance","inverse")}. Nearest neighbors, distance or inverse distance }
+  \item{measure}{one of \code{("euclidean","gcircle","chebyshev","braycur","canberra")}.The distance measure to be employed in the calculations.}
   \item{nn}{the number of nearest neighbors}
   \item{cutoff}{If type is \code{distance} or \code{inverse}. Assumes values 1, 2 or 3. 
   When 1, the cutoff is set to the first quantile of the distribution of distances. When 2 to the median, and when 3 to 
   the third quantile. Only observations with distance less than cutoff distance are neighbors. }
+  \item{miles}{If TRUE (default), distances are in miles, otherwise in Km. (See \code{\link{rdist.earth}} for details) }
+  \item{R}{Radius to use for sphere to find spherical distances.(See \code{\link{rdist.earth}} for details) }
   \item{shape.name}{The name of the shape file. See Details}
    \item{region.id.name}{The name of the \code{region.id} variable. See Details}
    \item{firstline}{If \code{TRUE}, a first line is added to the output file. See Details}

@@ -1,5 +1,6 @@
-distance <- function(coord,region.id=NULL,output=TRUE,type=c("NN","distance","inverse"),nn=6, cutoff=FALSE, shape.name=NULL,region.id.name=NULL,firstline=FALSE,file.name=NULL) {
+distance <- function(coord,region.id=NULL,output=TRUE,type=c("NN","distance","inverse"),measure=c("euclidean","gcircle","chebyshev","braycur","canberra"),nn=6, cutoff=FALSE, miles=TRUE,R=NULL, shape.name=NULL,region.id.name=NULL,firstline=FALSE,file.name=NULL) {
 	if ( !type %in% c("NN","distance","inverse") ) stop("unknown type")
+	if ( !measure[1] %in% c("euclidean","gcircle","chebyshev","braycur","canberra") ) stop("unknown measure")
 	if(!inherits(coord,c("data.frame","matrix"))){
 		coord <-  as.matrix(coord)
 		}
@@ -17,6 +18,7 @@ distance <- function(coord,region.id=NULL,output=TRUE,type=c("NN","distance","in
 	
 	if (length(unique(id)) != length(id)) 
             stop("non-unique region.id given")
+if(measure[1] == "gcircle") require(fields)            
 		
     k<- ifelse(ncol(coord)==3,2,1)
 	 x<- coord[,k]
@@ -37,13 +39,27 @@ Weights<-cbind(0,0,0)
 						for (i in vec[-length(vec)]) {
 									ref<-	vec[i]
 									w<-which(vec!=i & vec > i)
-									#print(w)
+
 									coordi<-cbind(vec1[i],vec2[i])
 									coordj<-cbind(vec1[w],vec2[w])
-									#print(coordi)
-									#print(coordj)
-									dif<-rowSums((coordj-matrix(coordi,length(w),2,byrow=TRUE))^2)
-									weights<-sqrt(dif)
+####
+
+		dist.fun<-switch(match.arg(measure), euclidean={
+			dist.euclidean
+			}, gcircle={
+				rdist.earth
+				}, chebyshev= {
+					dist.chebyshev
+					}, braycur={
+						dist.braycur
+						}, canberra = {
+							dist.canberra
+								})
+
+weights<-dist.fun(coordi,coordj,miles=TRUE,R=NULL)
+if(measure[1]=="gcircle") weights<-t(weights)            
+									
+#####									
 									
 if(type=="inverse") tmp <- rbind(cbind(rep(vec[i],length(w)),vec[w],1/weights),cbind(vec[w],rep(vec[i],length(w)),1/weights))
 else tmp <- rbind(cbind(rep(vec[i],length(w)),vec[w],weights),cbind(vec[w],rep(vec[i],length(w)),weights))

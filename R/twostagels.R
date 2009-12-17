@@ -1,5 +1,6 @@
 tsls <- function(y,yend,X,Zinst,end, reg, yor, modified=FALSE, HAC=FALSE, distance=distance,  type=c("Epanechnikov","Triangular","Bisquare","Parzen", "QS","TH"), bandwidth=bandwidth) {
 ### estimation engine that deals with the various cases
+#silent<-set.VerboseOption(FALSE)
 if(modified){
 	H <- cbind(reg, Zinst)
 	Z <- cbind(yend, X)
@@ -61,18 +62,18 @@ if(HAC){
 #					print(bandwith)
 #print(ker.fun)
 #print(is.numeric(bandwith))
-Ker<-lapply(distance$weights,ker.fun, bandwidth=bandwidth)
-#print(Ker)
-#		if (type=='Triangular') Ker<-lapply(dist$weights,triangular)
-#		if (type=="Epanechnikov") Ker<-lapply(dist$weights,epan)
-#		if (type=='Bisquare') Ker<-lapply(dist$weights,bisq)
-#		else stop("Kernel not implemented yet")
+Ker<-lapply(attributes(distance)$GeoDa$dist,ker.fun, bandwidth=bandwidth)
+#print(Ker[[1]])
+Kern<-nb2listw(distance,style="B", glist=Ker)
+#print(Kern$weights[[1]])
 He<-matrix(,dim(H)[1],dim(H)[2])
-KHpe<-matrix(,dim(H)[1],dim(H)[2])
+#KHpe<-matrix(,dim(H)[1],dim(H)[2])
 for (i in 1:dim(H)[2]) He[,i]<- H[,i] * e
-for(j in 1:dim(H)[2]){
-	for (i in 1:n) KHpe[i,j]<- sum(Ker[[i]]*He[distance$neigh[[i]],j])  + He[i,j]
-	 }
+#for(j in 1:dim(H)[2]){
+#	for (i in 1:n) KHpe[i,j]<- sum(Ker[[i]]*He[distance$neigh[[i]],j])  + He[i,j]
+#	 }
+
+KHpe<-lag.listw(Kern,He) +He
 KHeHe<-(t(He) %*% KHpe)
 #KHeHe<-crossprod(He, KHpe)
 HHp<-solve(HH)

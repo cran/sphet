@@ -1,12 +1,5 @@
 \name{stslshac}
 \alias{stslshac}
-\alias{kernel}
-\alias{bisq}
-\alias{epan}
-\alias{parzen}
-\alias{qs}
-\alias{th}
-\alias{triangular}
 \alias{tsls}
 
 \title{Spatial two stages least square with HAC standard errors}
@@ -19,7 +12,9 @@ where \eqn{R} is a non-stochastic matrix.
 }
 
 \usage{
-stslshac(formula, data=list(),listw,na.action=na.fail,zero.policy=FALSE,HAC=TRUE, distance=NULL,type=c("Epanechnikov","Triangular","Bisquare","Parzen", "QS","TH"), bandwidth="variable")
+stslshac(formula, data=list(),listw,na.action=na.fail,zero.policy=FALSE,
+HAC=TRUE, distance=NULL,type=c("Epanechnikov","Triangular","Bisquare","Parzen", "QS","TH"), 
+bandwidth="variable",W2X=TRUE)
 }
 
 \arguments{
@@ -37,6 +32,7 @@ stslshac(formula, data=list(),listw,na.action=na.fail,zero.policy=FALSE,HAC=TRUE
   \item{zero.policy}{See \code{lagsarlm} for details}
   \item{bandwidth}{"variable" (default) - or numeric when a fixed bandwidth is specified by the user.}
   \item{HAC}{if FALSE traditional standard errors are provided.}
+  \item{W2X}{default TRUE. if FALSE only WX are used as instruments in the spatial two stage least squares.}
 }
 
 
