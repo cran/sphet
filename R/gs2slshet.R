@@ -1,15 +1,18 @@
-gstslshet<-function(formula, data=list(),listw,na.action=na.fail,zero.policy=FALSE,initial.value=0.2,abs.tol=1e-20,rel.tol=1e-10,eps=1e-5,inverse=TRUE,sarar=TRUE){
+gstslshet<-function(formula, data=list(),listw,na.action=na.fail,zero.policy=NULL,initial.value=0.2,abs.tol=1e-20,rel.tol=1e-10,eps=1e-5,inverse=TRUE,sarar=TRUE){
 
 ##functions that need to be sourced
 	#source("twostagels.R")
 	#source("utilities.R")
 	#source("listw2dgCMatrix.R")
 	#source("Omega.R")
+	if (is.null(zero.policy))
+            zero.policy <- get.ZeroPolicyOption()
+        stopifnot(is.logical(zero.policy))
 	
 #extract model objects	
 	
 	mt<-terms(formula,data=data)
-	mf<-lm(formula, data, na.action=na.fail,method="model.frame")
+	mf<-lm(formula, data, na.action=na.action, method="model.frame")
 	na.act<-attr(mf,'na.action')
 
 # record call
@@ -88,10 +91,10 @@ ubase<-residuals(firststep)
 
 
 #GM step 1b
-		int1<-Ggfastfast(listw=listw,ubase,n)
+		int1<-Ggfastfast(listw=listw,ubase,n, zero.policy = zero.policy)
 ##One could start from this initial value but if uses optimize, the initial values are not an issue
 if (initial.value=="SAR"){
-		Wubase<-lag.listw(listw,ubase)
+		Wubase<-lag.listw(listw,ubase, zero.policy = zero.policy)
 		pars<-coefficients(lm(ubase~Wubase-1))
 		}
 else pars<-initial.value
@@ -104,7 +107,7 @@ optres1<-nlminb(pars, arg, lower= -0.9 + .Machine$double.eps , upper= 0.9 -  .Ma
 		u<-ubase
 		toinst<-wy
 		
-		fi<-fifour(x,listw,instr,ubase,wy,param,n,inverse,eps)
+		fi<-fifour(x,listw,instr,ubase,wy,param,n,inverse,eps, zero.policy= zero.policy)
 
 GMMfeas3<-nlminb(param, arg1, lower= -0.9 + .Machine$double.eps , upper= 0.9 -  .Machine$double.eps,control=list(abs.tol=abs.tol,rel.tol=rel.tol),v=int1, VC=fi$nlw)
 
@@ -112,19 +115,19 @@ GMMfeas3<-nlminb(param, arg1, lower= -0.9 + .Machine$double.eps , upper= 0.9 -  
 rhotilde<- GMMfeas3$par
 #print(rhotilde)
 
-fi1<-fifour(x,listw,instr,ubase,wy,rhotilde,n,inverse=inverse,eps=eps)
+fi1<-fifour(x,listw,instr,ubase,wy,rhotilde,n,inverse=inverse,eps=eps, zero.policy = zero.policy)
 Om<-Omega(n,gamma=fi1$res1,H=fi1$instr,param=rhotilde,G=int1$bigG,FIinv=fi1$nlw,a=fi1$a,FI=fi1$nl,P=fi1$P,gammas=fi1$gammas,Ws=fi1$Ws)
 
 yt  <- y - rhotilde * wy
-xt <- x - rhotilde * lag.listw(listw,x)
-wyt<-wy - rhotilde * lag.listw(listw,wy)
+xt <- x - rhotilde * lag.listw(listw,x, zero.policy = zero.policy)
+wyt<-wy - rhotilde * lag.listw(listw,wy, zero.policy = zero.policy)
 colnames(xt)<-xcolnames
 colnames(wyt)<-c('Wyt')
 
 secstepb<-tsls(y=yt, yend=wyt, X=xt, Zinst = instr, reg=x, end=wy, yor=y,modified=TRUE)
 
 utildeb<-secstepb$residuals
-int1b<-Ggfastfast(listw, utildeb,n)
+int1b<-Ggfastfast(listw, utildeb,n, zero.policy = zero.policy)
 psippb<-fistslsfast(reg=xt, Ws=fi$Ws, instr=instr, resid=utildeb, toinst=wyt, param=rhotilde,solo=x,end=wy)
 pars1<-rhotilde
 
@@ -156,18 +159,18 @@ W<-list(stat=stat,pval=pval)
 
 
 
-results<-list(coefficients=coeff,vcmat=Omfinal$VarCov, s2=s2, call=cl, residuals=as.numeric(utildeb), model=model.data,method=method,W=W,yhat=secstepb$yhat )
+results<-list(coefficients=coeff,var=Omfinal$VarCov, s2=s2, call=cl, residuals=as.numeric(utildeb), model=model.data,method=method,W=W,yhat=secstepb$yhat )
 }
 else{
 	##this is an error model estimated by ols
 firststep<-lm(y~x-1)
 ubase<-residuals(firststep)
 
-int1<-Ggfastfast(listw=listw,ubase,n)
+int1<-Ggfastfast(listw=listw,ubase,n, zero.policy = zero.policy)
 
 ##One could start from this initial value but if uses optimize, the initial values are not an issue
 if (initial.value=="SAR"){
-		Wubase<-lag.listw(listw,ubase)
+		Wubase<-lag.listw(listw,ubase, zero.policy = zero.policy)
 		pars<-coefficients(lm(ubase~Wubase-1))
 		}
 else pars<-initial.value
@@ -197,7 +200,7 @@ secstepb<-lm(yt~xt-1)
 
 utildeb<-y - x %*% as.matrix(coefficients(secstepb)) 
 
-int1b<-Ggfastfast(listw, utildeb,n)
+int1b<-Ggfastfast(listw, utildeb,n, zero.policy = zero.policy)
 
 psippb<-fistslserror(reg=xt, Ws=fi$Ws, resid=utildeb, param=rhotilde,solo=x)
 pars1<-rhotilde
@@ -219,12 +222,47 @@ model.data<-data.frame(cbind(y,x[,-1]))
 method<-"gs2slshac"
 
 
-results<-list(coefficients=coeff,vcmat=Omfinal$VarCov, s2=s2, call=cl, residuals=as.numeric(utildeb), model=model.data,method=method,W=NULL,yhat=fitted(secstepb) )
+results<-list(coefficients=coeff,var=Omfinal$VarCov, s2=s2, call=cl, residuals=as.numeric(utildeb), model=model.data,method=method,W=NULL,yhat=fitted(secstepb) )
 
 	
 	}
 
-class(results)<-"sphet"
+class(results)<-c("sphet", "gstsls")
 
 return(results)
 }
+
+impacts.gstsls <- function(obj, ..., tr=NULL, R=NULL, listw=NULL,
+    tol=1e-6, empirical=FALSE, Q=NULL) {
+    if (!is.null(obj$listw_style) && obj$listw_style != "W") 
+        stop("Only row-standardised weights supported")
+    coefs <- drop(obj$coefficients)
+    p2 <- length(coefs)
+    rho <- coefs[(p2-1)]
+    beta <- coefs[1:(p2-2)]
+    lambda <- coefs[p2]
+# rho is lag coef., lambda is error coef (reversed from function use)
+    icept <- grep("(Intercept)", names(beta))
+    iicept <- length(icept) > 0
+    if (iicept) {
+        P <- matrix(beta[-icept], ncol=1)
+        bnames <- names(beta[-icept])
+    } else {
+        P <- matrix(beta, ncol=1)
+        bnames <- names(beta)
+    }
+    p <- length(beta)
+    n <- length(obj$residuals)
+    mu <- c(beta, rho, lambda)
+    Sigma <- obj$var
+    irho <- p2-1
+    drop2beta <- c(p2-1, p2)
+    res <- spdep:::intImpacts(rho=rho, beta=beta, P=P, n=n, mu=mu,
+        Sigma=Sigma, irho=irho, drop2beta=drop2beta, bnames=bnames,
+        interval=NULL, type="lag", tr=tr, R=R, listw=listw, tol=tol,
+        empirical=empirical, Q=Q, icept=icept, iicept=iicept, p=p)
+    attr(res, "iClass") <- class(obj)
+    res
+}
+
+

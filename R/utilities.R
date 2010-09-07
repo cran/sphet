@@ -1,13 +1,14 @@
 
-arg<-function (rhopar, v) 
+arg<-function(rhopar, v) 
 {
     sys <- v$litg -v$bigG %*% c(rhopar, rhopar^2)
     value <- sum(sys^2)
+
 value
 }
 
 
-arg1<-function (rhopar, v, VC)
+arg1<-function(rhopar, v, VC)
 {
     sys <- v$litg - v$bigG %*% c(rhopar, rhopar^2) 
     value <- t(sys) %*%  VC  %*% sys
@@ -15,22 +16,23 @@ arg1<-function (rhopar, v, VC)
 }
 
 
-fifour<-function (reg, listw, instr, u,  toinst, param, n,inverse,eps) 
+fifour<-function(reg, listw, instr, u,  toinst, param, n, inverse, eps, zero.policy = NULL) 
 {
 			
 	H<-cbind(reg, instr) #elements to generate P
 	Z<-cbind(reg, toinst)
 	k<-dim(Z)[2]
-	HH<-crossprod(H)/n
+	HH<-crossprod(H)
 	HZ<-crossprod(H,Z)
 	ZH<-crossprod(Z,H)
+	HHn<-HH/n
 	HZn<-HZ/n
 	ZHn<-ZH/n
-	HHninv<-solve(HH)
+	HHninv<-solve(HHn)
 	sec<-ZHn %*% HHninv %*% HZn
 	secinv<-solve(sec)
 	P<-HHninv %*% HZn %*% secinv
-   Ws<-listw2dgCMatrix(listw)
+   Ws<-listw2dgCMatrix(listw, zero.policy = zero.policy)
     Wst<-t(Ws)
     WspWs<-crossprod(Ws)
     diag(WspWs)<-0
@@ -40,26 +42,28 @@ fifour<-function (reg, listw, instr, u,  toinst, param, n,inverse,eps)
     Wu<-Ws%*%u
     urWu<-u-param*Wu
     A1<-WspWs
-    A2A2<-Wst+Ws
-    A2A2t<-t(A2A2)
+    A2A2t<-Ws+Wst
     A1t<-t(A1)
     A1A1t<-A1+A1t
     alpha1<-(-1)*(ZprWsp%*%A1A1t%*%urWu)/n
     alpha2<-(-1)*(ZprWsp%*%A2A2t%*%urWu)/n
     gamma<-urWu^2 ##traces of the elements of psi
-	gammas<-as(Diagonal(,as.vector(gamma)),"sparseMatrix")
+#	gammas<-as(Diagonal(,as.vector(gamma)),"sparseMatrix")
+	gammas<-.symDiagonal(n, x = as.numeric(gamma), uplo = "U")
+#	gammas<-Diagonal(x = as.numeric(gamma))
    tr1<-sum(diag(A1A1t%*%gammas%*%A1A1t%*%gammas))/2
    tr2<-sum(diag(A2A2t%*%gammas%*%A2A2t%*%gammas))/2
    tr3<-sum(diag(A1A1t%*%gammas%*%A2A2t%*%gammas))/2
    a1p<-H%*%P%*%alpha1
 	a2p<-H%*%P%*%alpha2
-	a1<-matrix(,nrow=n,ncol=1)
-	a2<-matrix(,nrow=n,ncol=1)
+	
+	#a1<-matrix(,nrow=n,ncol=1)
+	#a2<-matrix(,nrow=n,ncol=1)
+		
 		if(inverse){	
 			IrWp<- -param*Wst
 			diag(IrWp)<-1
 			IrWpi<-solve(IrWp)
-			#print(IrWpi)
 			}
 			else{
 				eps<-eps
@@ -75,25 +79,22 @@ fifour<-function (reg, listw, instr, u,  toinst, param, n,inverse,eps)
 								}
 								
 			diag(IrWpi)<-1
-			#print(IrWpi)
 				}
 				
 			a1<-IrWpi%*%a1p
 			a2<-IrWpi%*%a2p
 
-#    	    print(a1)
 			a<-cbind(as.matrix(a1),as.matrix(a2))
 			a1gammaa1v<-sum(a1^2*gamma)
 			a2gammaa2v<-sum(a2*gamma*a2)
 			a2gammaa1v<-sum(a2*gamma*a1)
-	        fi11<- (as.matrix(tr1) + a1gammaa1v)/n
-           fi21<- (as.matrix(tr3) + a2gammaa1v)/n
-		    fi22<- (as.matrix(tr2) + a2gammaa2v)/n
-		    FIr1<- cbind(fi11, fi21)
-		    FIr2<- cbind(fi21, fi22)
+	      fi11<- (as.matrix(tr1) + a1gammaa1v)/n
+          fi21<- (as.matrix(tr3) + a2gammaa1v)/n
+		   fi22<- (as.matrix(tr2) + a2gammaa2v)/n
+		   FIr1<- cbind(fi11, fi21)
+		   FIr2<- cbind(fi21, fi22)
 		    FI<-rbind(FIr1, FIr2)
-		    FIinv<-solve(FI)
-		    
+		    FIinv<-solve(FI)		    
 list(nlw=FIinv, a=a, res1=gamma,instr=H, dim=n, nl=FI, Ws=Ws, P=P,gammas=gammas)
 }
 
@@ -145,22 +146,23 @@ fistslsfast<-function(reg, Ws, instr, resid, toinst, param, solo, end){
 	}
 
 
-Ggfastfast<-function (listw, u, n, zero.policy = FALSE) 
+Ggfastfast<-function(listw, u, n, zero.policy = NULL) 
 {
-     ub<-lag.listw(listw,u)
-     ubb<-lag.listw(listw,ub)
+     ub<-lag.listw(listw,u, zero.policy = zero.policy)
+     ubb<-lag.listw(listw,ub, zero.policy = zero.policy)
      diag1 <- ub * u
      diag2<-ub^2
-     Ws<-listw2dgCMatrix(listw)
+     Ws<-listw2dgCMatrix(listw, zero.policy = zero.policy)
      Wst<-t(Ws)
      Diag1<-as(Diagonal(,as.vector(diag1)),"sparseMatrix")
-	  tra<-sum(diag(Ws%*%Diag1%*%Wst))	
+	  tra<-sum(diag(Ws%*%Diag1%*%Wst))
 	  ubbub<-crossprod(ubb,ub)
  	  first<- (ubbub - tra)
  	  Diag2<-as(Diagonal(,as.vector(diag2)),"sparseMatrix")
 	  tttt<-sum(diag(Ws%*%Diag2%*%Wst))
 	  ubbubb<-crossprod(ubb,ubb)
      second<- (ubbubb - tttt)
+#    second<- (ubbubb + tttt)
      uubb<-crossprod(u,ubb)
      ubub<-crossprod(ub,ub)
      third<-uubb + ubub  
@@ -178,11 +180,11 @@ Ggfastfast<-function (listw, u, n, zero.policy = FALSE)
 }
 
 
-fierror<-function (reg, listw, u, param, n,inverse,eps) 
+fierror<-function(reg, listw, u, param, n,inverse,eps, zero.policy = NULL) 
 {
 			
 	P<-solve(crossprod(reg))
-   Ws<-listw2dgCMatrix(listw)
+   Ws<-listw2dgCMatrix(listw, zero.policy = zero.policy)
     Wst<-t(Ws)
     WspWs<-crossprod(Ws)
     diag(WspWs)<-0
