@@ -21,13 +21,6 @@ if (!is.null(na.act)) {
         listw <- subset(listw, subset, zero.policy = zero.policy)
     }
     
-#check that the distance measure is specificed
-if(is.null(distance)) stop("No distance measure specified")
-
-#check that dist is an object of class sphet distance
-if(!inherits(distance,"distance")) 
-	stop("The distance measure is not a distance object")
-
 
 #check that W ius an object of class listw
 if(!inherits(listw,"listw")) 
@@ -36,6 +29,13 @@ if(!inherits(listw,"listw"))
 ##check that an exiting kernel is specified
 if(HAC){
 if(!(type %in% c("Epanechnikov","Triangular","Bisquare","Parzen", "QS","TH"))) stop("Unknown kernel")
+#check that the distance measure is specificed
+if(is.null(distance) ) stop("No distance measure specified")
+
+#check that dist is an object of class sphet distance
+if(!inherits(distance,"distance")) 
+	stop("The distance measure is not a distance object")
+
 }
 #generates x and y 
 	y<-model.extract(mf,"response")

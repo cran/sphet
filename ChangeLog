@@ -19,3 +19,13 @@ With different data, differences could be quite large.
   o added the zero.policy option as in spdep
   
   o impacts() calculation for objects of class "sphet"
+
+
+Changes in Version 1.2-0
+
+  o Added the function spreg to match stata and GeoDa. 
+
+
+Changes in Version 1.4-0
+
+  o Read the instrument and endogenous variable from the data

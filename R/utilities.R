@@ -21,6 +21,7 @@ fifour<-function(reg, listw, instr, u,  toinst, param, n, inverse, eps, zero.pol
 			
 	H<-cbind(reg, instr) #elements to generate P
 	Z<-cbind(reg, toinst)
+
 	k<-dim(Z)[2]
 	HH<-crossprod(H)
 	HZ<-crossprod(H,Z)
@@ -183,7 +184,8 @@ Ggfastfast<-function(listw, u, n, zero.policy = NULL)
 fierror<-function(reg, listw, u, param, n,inverse,eps, zero.policy = NULL) 
 {
 			
-	P<-solve(crossprod(reg))
+	P<-solve(crossprod(reg)/n)
+	
    Ws<-listw2dgCMatrix(listw, zero.policy = zero.policy)
     Wst<-t(Ws)
     WspWs<-crossprod(Ws)
@@ -243,25 +245,30 @@ fierror<-function(reg, listw, u, param, n,inverse,eps, zero.policy = NULL)
 		    FIr2<- cbind(fi21, fi22)
 		    FI<-rbind(FIr1, FIr2)
 		    FIinv<-solve(FI)
+# print(FIinv)		    
 list(nlw=FIinv, a=a, res1=gamma, dim=n, nl=FI, Ws=Ws, P=P,gammas=gammas)
 }
 
 
 
 fistslserror<-function(reg, Ws, resid, param, solo){
-	n<-length(resid)
-	H <- solo
-	Z1<-solo
-	Z<-reg
-	HH<-crossprod(H)
-	HZ<-crossprod(H,Z)
-	ZH<-crossprod(Z,H)
-	HZn<-HZ/n
-	ZHn<-ZH/n
-	HHninv<-solve(HH/n)
-	sec<-ZHn %*% HHninv %*% HZn
-	secinv<-solve(sec)
-	P<-HHninv %*% HZn %*% secinv
+	 n<-length(resid)
+		  H <- solo
+		  Z1<-reg
+ 		 Z <- reg - param *Ws %*% Z1
+ 
+
+		 HH<-crossprod(H)
+		 HZ<-crossprod(H,Z)
+		 ZH<-crossprod(Z,H)
+		 HZn<-HZ/n
+		 ZHn<-ZH/n
+		 HHninv<-solve(HH/n)
+		 sec<-ZHn %*% HHninv %*% HZn
+		 secinv<-solve(sec)
+	     P<-HHninv %*% HZn %*% secinv
+ # P<-solve(crossprod(solo)/n)
+
 	Wst<-t(Ws)
 	A1<- Wst %*% Ws
 	diag(A1)<- 0
@@ -274,8 +281,8 @@ fistslserror<-function(reg, Ws, resid, param, solo){
 	IrWu<-resid-param*Wu
 	alpha1<-((-1)* Z1prZ1pWp %*%A1A1%*%IrWu)/n
 	alpha2<-((-1)* Z1prZ1pWp %*%A2A2%*%IrWu)/n
-	a1<-as.matrix(H%*%P%*%alpha1)
-	a2<-as.matrix(H%*%P%*%alpha2)
+	a1<-as.matrix(solo %*%P%*%alpha1)
+	a2<-as.matrix(solo %*%P%*%alpha2)
 	a<-as.matrix(cbind(as.matrix(a1),as.matrix(a2)))
 	gamma<-IrWu^2
 	gammas<-as(Diagonal(,as.vector(gamma)),"sparseMatrix")
@@ -292,5 +299,6 @@ fistslserror<-function(reg, Ws, resid, param, solo){
 	FIr2<- cbind(fi12, fi22)
 	FI<-rbind(as.matrix(FIr1), as.matrix(FIr2))
 	FIinv<-solve(as.matrix(FI))
+	 # print(FIinv)
 	list(nlw=as.matrix(FIinv), a=a, res1=gammas, dim=n, nl=FI, P=P)
 	}

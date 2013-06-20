@@ -1,16 +1,18 @@
 Package: sphet
-Version: 1.1-12
-Date: 2012-04-04
-Title: Spatial Models with heteroskedastic innovations
+Version: 1.4
+Date: 2013-06-20
+Title: Estimation of spatial autoregressive models with and without
+        heteroskedastic innovations
 Author: Gianfranco Piras <gpiras@mac.com>
 Maintainer: Gianfranco Piras <gpiras@mac.com>
-Depends: R (>= 2.15), nlme, spdep, Matrix, fields
-Description: GM estimation and Spatial HAC
+Depends: R (>= 3.0.1), nlme, spdep, Matrix, fields
+Description: Generalized Method of Moment estimation of Cliff-Ord-type
+        spatial autoregressive models with and without heteroskedastic
+        innovations
 License: GPL-2
 LazyLoad: yes
 LazyData: no
+Packaged: 2013-06-20 18:25:22 UTC; gpiras
+NeedsCompilation: no
 Repository: CRAN
-Repository/R-Forge/Project: sphet
-Repository/R-Forge/Revision: 43
-Packaged: 2012-04-12 16:30:32 UTC; rforge
-Date/Publication: 2012-04-13 20:28:29
+Date/Publication: 2013-06-21 08:00:54

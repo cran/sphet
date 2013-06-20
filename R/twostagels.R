@@ -60,19 +60,21 @@ if(HAC){
 								parzen
 								})
 #					print(bandwith)
-#print(ker.fun)
+# print(ker.fun)
 #print(is.numeric(bandwith))
 if(is.null(attributes(distance)$GeoDa$dist)){
 	Ker<-lapply(distance$weights,ker.fun, bandwidth=bandwidth)
+	# print(Ker)
 	Kern<-nb2listw(distance$neighbours,style="B", glist=Ker, zero.policy=zero.policy)
 	} 
 else{
 	Ker<-lapply(attributes(distance)$GeoDa$dist,ker.fun, bandwidth=bandwidth)
 	Kern<-nb2listw(distance,style="B", glist=Ker, zero.policy=zero.policy)
+	# print(Kern[[1]])
 	} 
-#print(Ker[[1]])
+# print(Ker[[1]])
 
-#print(Kern$weights[[1]])
+# print(Kern$weights[[1]])
 He<-matrix(,dim(H)[1],dim(H)[2])
 #KHpe<-matrix(,dim(H)[1],dim(H)[2])
 for (i in 1:dim(H)[2]) He[,i]<- H[,i] * e
