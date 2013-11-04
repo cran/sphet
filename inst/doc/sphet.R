@@ -10,6 +10,7 @@ options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 ### code chunk number 2: readdata
 ###################################################
 library("sphet")
+library(spdep)
 data("boston", package = "spdep")
 
 
