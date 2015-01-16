@@ -1,7 +1,5 @@
 spreg<-function(formula, data=list(), listw, listw2=NULL, endog = NULL, instruments= NULL, lag.instr = FALSE, initial.value=0.2, model = c("sarar", "lag", "error", "ivhac", "ols"), het = FALSE, verbose=FALSE, na.action = na.fail,  HAC = FALSE, distance = NULL, type=c("Epanechnikov","Triangular","Bisquare","Parzen", "QS","TH"), bandwidth="variable" ,step1.c = FALSE, control = list()){
 
-#abs.tol = 1e-20, rel.tol = 1e-10, eps = 1e-5,          	
-
          		
 #extract model objects	
 	mt<-terms(formula,data=data)
