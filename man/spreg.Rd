@@ -145,7 +145,7 @@ Roger Bivand, Gianfranco Piras (2015). Comparing Implementations of Estimation M
 library(spdep)
 data(columbus)
 listw<-nb2listw(col.gal.nb)
-res<- spreg(CRIME~HOVAL + INC, data=columbus , listw= listw,   het = TRUE, verbose = FALSE)
+res<-spreg(CRIME~HOVAL + INC, data=columbus , listw= listw,  model = "sarar", het = TRUE)
 summary(res)
 }
 \keyword{models}

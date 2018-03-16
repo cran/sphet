@@ -1,6 +1,6 @@
 spreg<-function(formula, data=list(), listw, listw2=NULL, endog = NULL, instruments= NULL, lag.instr = FALSE, initial.value=0.2, model = c("sarar", "lag", "error", "ivhac", "ols"), het = FALSE, verbose=FALSE, na.action = na.fail,  HAC = FALSE, distance = NULL, type=c("Epanechnikov","Triangular","Bisquare","Parzen", "QS","TH"), bandwidth="variable" ,step1.c = FALSE, control = list()){
 
-         		
+if(length(model != 1)) model <- "sarar"
 #extract model objects	
 	mt<-terms(formula,data=data)
 	mf<-lm(formula, data, na.action=na.action, method="model.frame")
@@ -47,7 +47,7 @@ if(!(type %in% c("Epanechnikov","Triangular","Bisquare","Parzen", "QS","TH"))) s
 	
 #check that W is an object of class listw or a Matrix 
 
-if(!(model %in% c("ols", "ols.end"))){
+if(!inherits(model, c("ols", "ols.end"))){
 	
 if(!inherits(listw,c("listw", "Matrix", "matrix"))) stop("listw format unknown")
 if(inherits(listw,"listw"))  Ws<-listw2dgCMatrix(listw)	
