@@ -1,4 +1,35 @@
-summary.sphet<-function(object, width=getOption("width"),digits=getOption("digits"),obsinfo=FALSE,...){
+#' @name summary.sphet
+#' @aliases summary.sphet
+#' @aliases sumres
+#' @title print method for class sphet
+#' 
+#' 
+#' @description Method used to print objects of class \code{'summary.sphet'} and \code{'sphet'}
+#' 
+#' @usage \method{summary}{sphet}(object, width=getOption("width"), digits=getOption("digits"),obsinfo=FALSE,...)
+#' 
+#' 
+#' @param object an object of class 'sphet'
+#' @param width controls the maximum number of columns on a line used in printing
+#' @param digits minimal number of significant digits, see \code{print.default}
+#' @param obsinfo for objects of class \code{distance}: if \code{TRUE} prints observation-wise information
+#' @param ... additional arguments to be passed
+#' @details The summary function summary.sphet returns an objects of class 'sphet' 
+#' organized in a coefficient matrix.
+#' @seealso \code{\link{gstslshet}}, \code{\link{stslshac}}
+#' 
+#' @author Gianfranco Piras\email{gpiras@mac.com}
+#' @examples
+#' library(spdep)
+#' data(columbus)
+#' listw <- nb2listw(col.gal.nb)
+#' res <- spreg(CRIME~HOVAL + INC, data=columbus, listw=listw, model ="sarar")
+#' summary(res)
+#' @export
+#' @method summary sphet
+
+
+summary.sphet <- function(object, width=getOption("width"),digits=getOption("digits"),obsinfo=FALSE,...){
 
 	if(inherits(object,"distance")){
 		weights<-	attributes(object)$GeoDa$dist
@@ -16,7 +47,8 @@ summary.sphet<-function(object, width=getOption("width"),digits=getOption("digit
 	coeff<-object$coefficients
 	vcmat<-object$var
 	se<-sqrt(diag(vcmat))
-   t<-coeff/se
+   t <- as.numeric(coeff/se)
+  # print(t)
    pval<-pnorm(abs(t),lower.tail=FALSE) * 2
    CoefTable <- cbind(coeff,se,t,pval)
 if(object$method=="s2slshac")  { 
@@ -28,9 +60,40 @@ else colnames(CoefTable) <- c("Estimate","Std. Error","t-value","Pr(>|t|)")
 	class(object)<- c('summary.sphet','sphet')
 	}
 	object
-	}
-	
-	print.summary.sphet <- function(x,digits= max(3, getOption("digits") - 2),width=getOption("width"),obsinfo=FALSE,...){
+}
+
+#' @name print.summary.sphet
+#' @aliases print.summary.sphet
+#' @title print method for class sphet
+#' 
+#' 
+#' @description Method used to print objects of class \code{'summary.sphet'} and \code{'sphet'}
+#' 
+#' @usage \method{print}{summary.sphet}(x,digits= max(3, getOption("digits") - 2), 
+#' width=getOption("width"), obsinfo=FALSE,...)
+#' 
+#' 
+#' @param x an object of class 'sphet'
+#' @param digits minimal number of significant digits, see \code{print.default}
+#' @param width controls the maximum number of columns on a line used in printing
+#' @param obsinfo for objects of class \code{distance}: if \code{TRUE} prints observation-wise information
+#' @param ... additional arguments to be passed
+#' 
+#' @details The summary function summary.sphet returns an objects of class 'sphet' 
+#' organized in a coefficient matrix.
+#' @seealso \code{\link{gstslshet}}, \code{\link{stslshac}}
+#' 
+#' @author Gianfranco Piras\email{gpiras@mac.com}
+#' @examples
+#' library(spdep)
+#' data(columbus)
+#' listw <- nb2listw(col.gal.nb)
+#' res <- spreg(CRIME~HOVAL + INC, data=columbus, listw=listw, model ="sarar")
+#' summary(res)
+#' @export
+#' @method print summary.sphet
+
+	print.summary.sphet <- function(x, digits= max(3, getOption("digits") - 2), width=getOption("width"), obsinfo=FALSE,...){
 if(inherits(x,"distance")){
 	cat("\n Number of observations:\n")
 	cat(" n:", x$n, "\n")
@@ -50,12 +113,11 @@ if (obsinfo){
 			
 			else{
 				
-if (x$method=="s2slshac") {
-if (x$HAC) cat("\n Stsls with Spatial HAC standard errors\n")
-else cat("\n Stsls \n")
-}
-else cat("\n Generalized stsls\n")		  				
-		  cat("\nCall:\n")
+if (x$method=="s2slshac" ) cat("\n Stsls with Spatial HAC standard errors\n")
+			  if ( x$method=="olsshac" ) cat("\n Linear Model with Spatial HAC standard errors\n")
+if (x$method %in% c("gmm error", "gmm lag", "gmm sarar")) cat("\n Generalized stsls\n")		  				
+			  
+	cat("\nCall:\n")
   print(x$call)
 
   cat("\nResiduals:\n")
@@ -67,7 +129,7 @@ else cat("\n Generalized stsls\n")
 		  cat("\nCoefficients:\n")
   printCoefmat(x$CoefTable,digits=digits)
 
-if(x$method=="gs2slshac") {
+if(x$method=="gmm sarar") {
 	
 	if(!is.null(x$W)){
 		  cat("\nWald test that rho and lambda are both zero:\n")
@@ -88,6 +150,32 @@ sumres <- function(x){
   sr
 }
 
+#' @name print.sphet
+#' @aliases print.sphet
+#' @title print method for class sphet
+#' 
+#' 
+#' @description Method used to print objects of class \code{'summary.sphet'} and \code{'sphet'}
+#' 
+#' @usage \method{print}{sphet}(x, digits = max(3, getOption("digits") - 3),...)
+#' 
+#' 
+#' @param x an object of class 'sphet'
+#' @param digits minimal number of significant digits, see \code{print.default}
+#' @param ... additional arguments to be passed
+#' @details The summary function summary.sphet returns an objects of class 'sphet' 
+#' organized in a coefficient matrix.
+#' @seealso \code{\link{gstslshet}}, \code{\link{stslshac}}
+#' 
+#' @author Gianfranco Piras\email{gpiras@mac.com}
+#' @examples
+#' library(spdep)
+#' data(columbus)
+#' listw <- nb2listw(col.gal.nb)
+#' res <- spreg(CRIME~HOVAL + INC, data=columbus, listw=listw, model ="sarar")
+#' summary(res)
+#' @export
+#' @method print sphet
 
 print.sphet <- function(x, digits = max(3, getOption("digits") - 3),...) 
 {
@@ -100,7 +188,7 @@ else{
     cat("\nCall:\n", deparse(x$call), "\n\n", sep = "")
     if (length(coef(x))) {
         cat("Coefficients:\n")
-        print.default(format(coef(x), digits = digits), print.gap = 2, 
+        print.default(format(x$coefficients[,1], digits = digits), print.gap = 2, 
             quote = FALSE)
     }
     else cat("No coefficients\n")
