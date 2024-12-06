@@ -14,11 +14,8 @@
 #' summary(res)
 #' effects <- impacts(res, listw = listw, R = 399)
 #' summary(effects)
-#' @export
-impacts <- function(obj, ...){
-  UseMethod("impacts", obj)
-}
-
+#' @aliases impacts
+#' @export impacts
 #' @title Generate impacts for objects of class sarar_gmm created in sphet
 #'
 #' @param obj A spreg spatial regression object created by \code{spreg} with model ="sarar"
@@ -35,8 +32,8 @@ impacts <- function(obj, ...){
 #'
 #' @references 
 #' Roger Bivand, Gianfranco Piras (2015). Comparing Implementations of Estimation Methods for Spatial Econometrics. \emph{Journal of Statistical Software}, 63(18), 1-36. \url{https://www.jstatsoft.org/v63/i18/}.
-#' Harry Kelejian, Gianfranco Piras (2020). Spillover effects in spatial models: Generalization and extensions. \emph{Journal of Regional Science}, 60(3), 425-442. \url{https://onlinelibrary.wiley.com/doi/10.1111/jors.12476}
-#'
+#' Harry Kelejian, Gianfranco Piras (2020). Spillover effects in spatial models: Generalization and extensions. \emph{Journal of Regional Science}, 60(3), 425-442. 
+#' Gianfranco Piras, Paolo Postiglione (2022).  A deeper look at impacts in spatial Durbin model with sphet. \emph{Geographical Analysis}, 54(3), 664-684. 
 #' @return Estimate of the Average Total, Average Direct, and Average Indirect Effects
 #'
 #' @examples
@@ -105,11 +102,11 @@ impacts.gstsls <- function(obj, ..., tr=NULL, R=NULL, listw=NULL, evalues=NULL,
     if(is.null(tr)){
     if(is.null(evalues)) evalues <- eigen(object$listw)$values
     }
-    if(isTRUE(object$Durbin) | class(object$Durbin) == "formula") vc_impacts_formula_sarar_mixed(object, evalues, tr, prt)
+    if(isTRUE(object$Durbin) | inherits(object$Durbin,"formula")) vc_impacts_formula_sarar_mixed(object, evalues, tr, prt)
     else vc_impacts_formula_sarar(object, evalues, tr, prt)
   }
   else{
-  if(isTRUE(object$Durbin) | class(object$Durbin) == "formula"){
+  if(isTRUE(object$Durbin) | inherits(object$Durbin,"formula")){
     
     type <- "mixed"
   
@@ -342,12 +339,12 @@ if((lambda > interval[2] ) | (lambda < interval[1])) warning("Value of the spati
 #' 
 #' @references 
 #' Roger Bivand, Gianfranco Piras (2015). Comparing Implementations of Estimation Methods for Spatial Econometrics. \emph{Journal of Statistical Software}, 63(18), 1-36. \url{https://www.jstatsoft.org/v63/i18/}.
-#' Harry Kelejian, Gianfranco Piras (2020). Spillover effects in spatial models: Generalization and extensions. \emph{Journal of Regional Science}, 60(3), 425-442. \url{https://onlinelibrary.wiley.com/doi/10.1111/jors.12476}
-#'
+#' Harry Kelejian, Gianfranco Piras (2020). Spillover effects in spatial models: Generalization and extensions. \emph{Journal of Regional Science}, 60(3), 425-442. 
+#' Gianfranco Piras, Paolo Postiglione (2022).  A deeper look at impacts in spatial Durbin model with sphet. \emph{Geographical Analysis}, 54(3), 664-684. 
 #' @examples
 #' require("sf", quietly=TRUE)
 #' library(coda)
-#' columbus <- st_read(system.file("shapes/columbus.shp", package="spData")[1], quiet=TRUE)
+#' columbus <- st_read(system.file("shapes/columbus.gpkg", package="spData")[1], quiet=TRUE)
 #' col.gal.nb <- spdep::read.gal(system.file("weights/columbus.gal", package="spData")[1])
 #' listw <- spdep::nb2listw(col.gal.nb)
 #' ev <- spatialreg::eigenw(listw)
@@ -427,12 +424,12 @@ impacts.stsls_sphet <- function(obj, ..., tr=NULL, R=NULL, listw=NULL,
     if(is.null(tr)){
     if(is.null(evalues)) evalues <- eigen(object$listw)$values
     }
-    if(isTRUE(object$Durbin) | class(object$Durbin) == "formula") vc_impacts_formula_lag_mixed(object, evalues, tr, prt)
+    if(isTRUE(object$Durbin) | inherits(object$Durbin, "formula")) vc_impacts_formula_lag_mixed(object, evalues, tr, prt)
     else vc_impacts_formula_lag(object, evalues, tr, prt)
   }
   else{ 
   
-  if(isTRUE(object$Durbin) | class(object$Durbin) == "formula"){
+  if(isTRUE(object$Durbin) | inherits(object$Durbin, "formula")){
   
    type <- "mixed"
    if (is.null(object$interval)) interval <- c(-1,0.999)
@@ -692,7 +689,7 @@ impacts.stsls_sphet <- function(obj, ..., tr=NULL, R=NULL, listw=NULL,
 #' summary(impacts(lm.D3))
 #' 
 #' require("sf", quietly=TRUE)
-#' columbus <- st_read(system.file("shapes/columbus.shp", package="spData")[1], quiet=TRUE)
+#' columbus <- st_read(system.file("shapes/columbus.gpkg", package="spData")[1], quiet=TRUE)
 #' col.gal.nb <- spdep::read.gal(system.file("weights/columbus.gal", package="spData")[1])
 #' listw <- spdep::nb2listw(col.gal.nb)
 #' knear <- spdep::knearneigh(cbind(columbus$X, columbus$Y), 5)
@@ -936,7 +933,7 @@ impacts.ols_sphet <- function(obj, ..., tr=NULL, R=NULL, listw=NULL,
 #' @examples
 #' library(sphet)
 #' require("sf", quietly=TRUE)
-#' columbus <- st_read(system.file("shapes/columbus.shp", package="spData")[1], quiet=TRUE)
+#' columbus <- st_read(system.file("shapes/columbus.gpkg", package="spData")[1], quiet=TRUE)
 #' col.gal.nb <- spdep::read.gal(system.file("weights/columbus.gal", package="spData")[1])
 #' listw <- spdep::nb2listw(col.gal.nb)
 #' error1 <- spreg(CRIME ~ INC + HOVAL, columbus, listw, Durbin=TRUE,

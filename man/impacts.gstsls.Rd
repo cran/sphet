@@ -2,7 +2,8 @@
 % Please edit documentation in R/impacts.R
 \name{impacts.gstsls}
 \alias{impacts.gstsls}
-\title{Generate impacts for objects of class sarar_gmm created in sphet}
+\alias{impacts}
+\title{Generate impacts for spreg lag and sarar models}
 \usage{
 \method{impacts}{gstsls}(
   obj,
@@ -43,11 +44,22 @@
 }
 \value{
 Estimate of the Average Total, Average Direct, and Average Indirect Effects
+
+Estimate of the Average Total, Average Direct, and Average Indirect Effects
 }
 \description{
+Generate impacts for spreg lag and sarar models
+
 Generate impacts for objects of class sarar_gmm created in sphet
 }
 \examples{
+data(columbus, package="spdep")
+listw <- spdep::nb2listw(col.gal.nb)
+res <- spreg(CRIME~HOVAL + INC, data=columbus , listw= listw,
+            het = TRUE, verbose = FALSE, model = "sarar")
+summary(res)
+effects <- impacts(res, listw = listw, R = 399)
+summary(effects)
 data(boston, package="spData")
 Wb <- as(spdep::nb2listw(boston.soi), "CsparseMatrix")
 ev <- eigen(Wb)$values
@@ -100,5 +112,6 @@ summary(impacts(sarar4, tr = trMatb, R=1000), zstats=TRUE, short=TRUE)
 }
 \references{
 Roger Bivand, Gianfranco Piras (2015). Comparing Implementations of Estimation Methods for Spatial Econometrics. \emph{Journal of Statistical Software}, 63(18), 1-36. \url{https://www.jstatsoft.org/v63/i18/}.
-Harry Kelejian, Gianfranco Piras (2020). Spillover effects in spatial models: Generalization and extensions. \emph{Journal of Regional Science}, 60(3), 425-442. \url{https://onlinelibrary.wiley.com/doi/10.1111/jors.12476}
+Harry Kelejian, Gianfranco Piras (2020). Spillover effects in spatial models: Generalization and extensions. \emph{Journal of Regional Science}, 60(3), 425-442. 
+Gianfranco Piras, Paolo Postiglione (2022).  A deeper look at impacts in spatial Durbin model with sphet. \emph{Geographical Analysis}, 54(3), 664-684.
 }

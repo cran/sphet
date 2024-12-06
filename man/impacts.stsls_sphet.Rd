@@ -50,7 +50,7 @@ Generate impacts for objects of class lag_gmm created in sphet
 \examples{
 require("sf", quietly=TRUE)
 library(coda)
-columbus <- st_read(system.file("shapes/columbus.shp", package="spData")[1], quiet=TRUE)
+columbus <- st_read(system.file("shapes/columbus.gpkg", package="spData")[1], quiet=TRUE)
 col.gal.nb <- spdep::read.gal(system.file("weights/columbus.gal", package="spData")[1])
 listw <- spdep::nb2listw(col.gal.nb)
 ev <- spatialreg::eigenw(listw)
@@ -117,5 +117,6 @@ summary(impacts(mobj1_gm, evalues=ev, R=200), short=TRUE, zstats=TRUE)
 }
 \references{
 Roger Bivand, Gianfranco Piras (2015). Comparing Implementations of Estimation Methods for Spatial Econometrics. \emph{Journal of Statistical Software}, 63(18), 1-36. \url{https://www.jstatsoft.org/v63/i18/}.
-Harry Kelejian, Gianfranco Piras (2020). Spillover effects in spatial models: Generalization and extensions. \emph{Journal of Regional Science}, 60(3), 425-442. \url{https://onlinelibrary.wiley.com/doi/10.1111/jors.12476}
+Harry Kelejian, Gianfranco Piras (2020). Spillover effects in spatial models: Generalization and extensions. \emph{Journal of Regional Science}, 60(3), 425-442. 
+Gianfranco Piras, Paolo Postiglione (2022).  A deeper look at impacts in spatial Durbin model with sphet. \emph{Geographical Analysis}, 54(3), 664-684.
 }

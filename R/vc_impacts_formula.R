@@ -50,7 +50,7 @@ vc_impacts_formula_lag <- function(obj, ev, tr = NULL, prt = T){
     tr_G <- n +sum(tr * powl)
     scl <- 2:length(tr)
     powl <- vector("numeric", length = (length(tr)-1))
-    for(i in 1:29) powl[i] <-  lambda^i
+    for(i in 1:length(powl)) powl[i] <-  lambda^i
     dv_l <- sum(tr * c(0,powl)*c(0,scl))
   }
   else{
@@ -75,7 +75,7 @@ vc_impacts_formula_lag <- function(obj, ev, tr = NULL, prt = T){
   AIE <- ATE - ADE
   der_AIE <- der_ATE - der_ADE
   se_AIE <- c()
-  se_AIE <- c(se_AIE, sqrt(as.numeric(matrix(der_AIE[i,], nrow = 1, ncol = 2) %*% 
+  for(i in 1:p1) se_AIE <- c(se_AIE, sqrt(as.numeric(matrix(der_AIE[i,], nrow = 1, ncol = 2) %*% 
                                         Sigma[c(i,pl),c(i,pl)] %*% t(matrix(der_AIE[i,], nrow = 1, ncol = 2)))))
   
   #############################################
@@ -182,7 +182,7 @@ vc_impacts_formula_sarar <- function(obj, ev, tr = NULL, prt = T){
     tr_G <- n +sum(tr * powl)
     scl <- 2:length(tr)
     powl <- vector("numeric", length = (length(tr)-1))
-    for(i in 1:29) powl[i] <-  lambda^i
+    for(i in 1:length(powl)) powl[i] <-  lambda^i
     dv_l <- sum(tr * c(0,powl)*c(0,scl))
   }
   else{
@@ -208,7 +208,7 @@ vc_impacts_formula_sarar <- function(obj, ev, tr = NULL, prt = T){
   AIE <- ATE - ADE
   der_AIE <- der_ATE - der_ADE
   se_AIE <- c()
-  se_AIE <- c(se_AIE, sqrt(as.numeric(matrix(der_AIE[i,], nrow = 1, ncol = 2) %*% 
+  for(i in 1:p1) se_AIE <- c(se_AIE, sqrt(as.numeric(matrix(der_AIE[i,], nrow = 1, ncol = 2) %*% 
                                         Sigma[c(i,pl),c(i,pl)] %*% t(matrix(der_AIE[i,], nrow = 1, ncol = 2)))))
   
   #############################################
@@ -333,7 +333,7 @@ if(isTRUE(obj$Durbin)){
     tr_H2 <- sum(tr * scl*powl)
     scl <- 2:length(tr)
     powl <- vector("numeric", length = (length(tr)-1))
-    for(i in 1:29) powl[i] <-  lambda^i
+    for(i in 1:length(powl)) powl[i] <-  lambda^i
     dv_l <- sum(tr * c(0,powl)*c(0,scl))
     
   }
@@ -478,7 +478,7 @@ if(isTRUE(obj$Durbin)){
       tr_H2 <- sum(tr * scl*powl)
       scl <- 2:length(tr)
       powl <- vector("numeric", length = (length(tr)-1))
-      for(i in 1:29) powl[i] <-  lambda^i
+      for(i in 1:length(powl)) powl[i] <-  lambda^i
       dv_l <- sum(tr * c(0,powl)*c(0,scl))
       
     }
@@ -634,7 +634,7 @@ vc_impacts_formula_sarar_mixed <- function(obj, ev, tr = NULL, prt = T){
       tr_H2 <- sum(tr * scl*powl)
       scl <- 2:length(tr)
       powl <- vector("numeric", length = (length(tr)-1))
-      for(i in 1:29) powl[i] <-  lambda^i
+      for(i in 1:length(powl)) powl[i] <-  lambda^i
       dv_l <- sum(tr * c(0,powl)*c(0,scl))
       
     }
@@ -684,7 +684,7 @@ vc_impacts_formula_sarar_mixed <- function(obj, ev, tr = NULL, prt = T){
     n <- length(obj$residuals)
     
     Sigma <- obj$var[-p2,-p2]
-    print(Sigma)
+    #print(Sigma)
     if((lambda > interval[2] ) | (lambda < interval[1])) warning("Value of the spatial parameter outside of parameter space")    
     
     dn <- grep("lag_", names(beta)) #which of the names of beta has "lag_"
@@ -779,7 +779,7 @@ vc_impacts_formula_sarar_mixed <- function(obj, ev, tr = NULL, prt = T){
       tr_H2 <- sum(tr * scl*powl)
       scl <- 2:length(tr)
       powl <- vector("numeric", length = (length(tr)-1))
-      for(i in 1:29) powl[i] <-  lambda^i
+      for(i in 1:length(powl)) powl[i] <-  lambda^i
       dv_l <- sum(tr * c(0,powl)*c(0,scl))
       
     }

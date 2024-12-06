@@ -2,8 +2,6 @@
 #' @aliases summary.sphet
 #' @aliases sumres
 #' @title print method for class sphet
-#' 
-#' 
 #' @description Method used to print objects of class \code{'summary.sphet'} and \code{'sphet'}
 #' 
 #' @usage \method{summary}{sphet}(object, width=getOption("width"), digits=getOption("digits"),obsinfo=FALSE,...)
@@ -51,7 +49,7 @@ summary.sphet <- function(object, width=getOption("width"),digits=getOption("dig
   # print(t)
    pval<-pnorm(abs(t),lower.tail=FALSE) * 2
    CoefTable <- cbind(coeff,se,t,pval)
-if(object$method=="s2slshac")  { 
+if(object$method=="legacy")  { 
 	 if (object$HAC) colnames(CoefTable) <- c("Estimate","SHAC St.Er.","t-value","Pr(>|t|)")
 	 else colnames(CoefTable) <- c("Estimate","Std. Error","t-value","Pr(>|t|)")
 	}
@@ -65,8 +63,6 @@ else colnames(CoefTable) <- c("Estimate","Std. Error","t-value","Pr(>|t|)")
 #' @name print.summary.sphet
 #' @aliases print.summary.sphet
 #' @title print method for class sphet
-#' 
-#' 
 #' @description Method used to print objects of class \code{'summary.sphet'} and \code{'sphet'}
 #' 
 #' @usage \method{print}{summary.sphet}(x,digits= max(3, getOption("digits") - 2), 
@@ -112,10 +108,271 @@ if (obsinfo){
 	}
 			
 			else{
-				
-if (x$method=="s2slshac" ) cat("\n Stsls with Spatial HAC standard errors\n")
-			  if ( x$method=="olsshac" ) cat("\n Linear Model with Spatial HAC standard errors\n")
-if (x$method %in% c("gmm error", "gmm lag", "gmm sarar")) cat("\n Generalized stsls\n")		  				
+			  
+				if(x$method == "legacy"){
+				  if(x$HAC){
+				  cat("======================================================\n")
+				  cat("======================================================\n")
+				  cat("                   Spatial Lag Model \n")
+				  cat("                  HAC standard errors\n")
+				  cat("======================================================\n")
+				  cat("======================================================\n")
+				  }
+				  else{
+				    cat("======================================================\n")
+				    cat("======================================================\n")
+				    cat("                   Spatial Lag Model \n")
+				    cat("======================================================\n")
+				    cat("======================================================\n")
+				  }
+				}
+if (x$method=="s2slshac" ){ 
+  
+  if((isTRUE(x$Durbin)  | inherits(x$Durbin, "formula")) && x$HAC){
+    cat("======================================================\n")
+    cat("======================================================\n")
+    cat("                   SLX model \n")
+    cat("            with endogenous variables\n")
+    cat("              HAC standard errors\n")
+    cat("======================================================\n")
+    cat("======================================================\n")
+  }
+  if(!isTRUE(x$Durbin) && !inherits(x$Durbin, "formula") && x$HAC){
+    cat("======================================================\n")
+    cat("======================================================\n")
+    cat("                  Linear model \n")
+    cat("             with endogenous variables\n")
+    cat("               HAC standard errors\n")
+    cat("======================================================\n")
+    cat("======================================================\n")
+  }
+  if((isTRUE(x$Durbin)  | inherits(x$Durbin, "formula")) && !x$HAC){
+    if(x$het){
+      cat("======================================================\n")
+      cat("======================================================\n")
+      cat("                    SLX model \n")
+      cat("            with endogenous variables\n")
+      cat("              White standard errors\n")
+      cat("======================================================\n")
+      cat("======================================================\n")
+    }
+    else{
+      cat("======================================================\n")
+      cat("======================================================\n")
+      cat("                   SLX model  \n")
+      cat("            with endogenous variables\n")
+      cat("======================================================\n")
+      cat("======================================================\n")
+    }
+  }
+  if(!isTRUE(x$Durbin) && !inherits(x$Durbin, "formula") && !x$HAC){
+    if(x$het){
+      cat("======================================================\n")
+      cat("======================================================\n")
+      cat("                   Linear model \n")
+      cat("            with endogenous variables\n")
+      cat("              White standard errors\n")
+      cat("======================================================\n")
+      cat("======================================================\n")
+    }
+    else{
+      cat("======================================================\n")
+      cat("======================================================\n")
+      cat("                 Linear model  \n")
+      cat("            with endogenous variables\n")
+      cat("======================================================\n")
+      cat("======================================================\n")
+    }
+    
+  }
+}
+			  
+			  if ( x$method=="olshac" ){ 
+			      if((isTRUE(x$Durbin)  | inherits(x$Durbin, "formula")) && x$HAC){
+			    cat("======================================================\n")
+			    cat("======================================================\n")
+			    cat("                   SLX model \n")
+			    cat("              HAC standard errors\n")
+			    cat("======================================================\n")
+			    cat("======================================================\n")
+			      }
+			       if(!isTRUE(x$Durbin) && !inherits(x$Durbin, "formula") && x$HAC){
+			         cat("======================================================\n")
+			         cat("======================================================\n")
+			         cat("                  Linear model \n")
+			         cat("              HAC standard errors\n")
+			         cat("======================================================\n")
+			         cat("======================================================\n")
+			       }
+			    if((isTRUE(x$Durbin)  | inherits(x$Durbin, "formula")) && !x$HAC){
+			      if(x$het){
+			      cat("======================================================\n")
+			      cat("======================================================\n")
+			      cat("                    SLX model \n")
+			      cat("              White standard errors\n")
+			      cat("======================================================\n")
+			      cat("======================================================\n")
+			      }
+			      else{
+			        cat("======================================================\n")
+			        cat("======================================================\n")
+			        cat("                     SLX model  \n")
+			        cat("======================================================\n")
+			        cat("======================================================\n")
+			      }
+			    }
+			    if(!isTRUE(x$Durbin) && !inherits(x$Durbin, "formula") && !x$HAC){
+			      if(x$het){
+			        cat("======================================================\n")
+			        cat("======================================================\n")
+			        cat("                   Linear model  \n")
+			        cat("              White standard errors\n")
+			        cat("======================================================\n")
+			        cat("======================================================\n")
+			      }
+			      else{
+			        cat("======================================================\n")
+			        cat("======================================================\n")
+			        cat("                 Linear model  \n")
+			        cat("======================================================\n")
+			        cat("======================================================\n")
+			      }
+			      
+			    }
+			    }
+			  
+if (x$method %in% c("gmm error", "gmm lag", "gmm sarar")){
+  if(x$method =="gmm error"){
+    cat("======================================================\n")
+    cat("======================================================\n")
+    cat("               GMM Spatial Error Model\n")
+    cat("======================================================\n")
+    cat("======================================================\n")
+  }
+  if(x$method =="gmm lag"){
+    if(is.null(x$endog)){
+    
+    if((isTRUE(x$Durbin)  | inherits(x$Durbin, "formula")) && x$HAC){
+      cat("======================================================\n")
+      cat("======================================================\n")
+      cat("              Spatial Durbin Model \n")
+      cat("              HAC standard errors\n")
+      cat("======================================================\n")
+      cat("======================================================\n")
+    }
+    if(!isTRUE(x$Durbin) && !inherits(x$Durbin, "formula") && x$HAC){
+      cat("======================================================\n")
+      cat("======================================================\n")
+      cat("                Spatial Lag Model \n")
+      cat("               HAC standard errors\n")
+      cat("======================================================\n")
+      cat("======================================================\n")
+    }
+    if((isTRUE(x$Durbin)  | inherits(x$Durbin, "formula")) && !x$HAC){
+      if(x$het){
+        cat("======================================================\n")
+        cat("======================================================\n")
+        cat("              Spatial Durbin Model\n")
+        cat("              White standard errors\n")
+        cat("======================================================\n")
+        cat("======================================================\n")
+      }
+      else{
+        cat("======================================================\n")
+        cat("======================================================\n")
+        cat("               Spatial Durbin Model\n")
+        cat("======================================================\n")
+        cat("======================================================\n")
+      }
+    }
+    if(!isTRUE(x$Durbin) && !inherits(x$Durbin, "formula") && !x$HAC){
+      if(x$het){
+        cat("======================================================\n")
+        cat("======================================================\n")
+        cat("                Spatial Lag Model \n")
+        cat("              White standard errors\n")
+        cat("======================================================\n")
+        cat("======================================================\n")
+      }
+      else{
+        cat("======================================================\n")
+        cat("======================================================\n")
+        cat("                 Spatial Lag model  \n")
+        cat("======================================================\n")
+        cat("======================================================\n")
+      }
+      
+    }
+    }
+    
+    else{
+      if((isTRUE(x$Durbin)  | inherits(x$Durbin, "formula")) && x$HAC){
+        cat("======================================================\n")
+        cat("======================================================\n")
+        cat("              Spatial Durbin Model \n")
+        cat("            with endogenous variables\n")
+        cat("              HAC standard errors\n")
+        cat("======================================================\n")
+        cat("======================================================\n")
+      }
+      if(!isTRUE(x$Durbin) && !inherits(x$Durbin, "formula") && x$HAC){
+        cat("======================================================\n")
+        cat("======================================================\n")
+        cat("                 Spatial Lag Model \n")
+        cat("             with endogenous variables\n")
+        cat("               HAC standard errors\n")
+        cat("======================================================\n")
+        cat("======================================================\n")
+      }
+      if((isTRUE(x$Durbin)  | inherits(x$Durbin, "formula")) && !x$HAC){
+        if(x$het){
+          cat("======================================================\n")
+          cat("======================================================\n")
+          cat("               Spatial Durbin Model \n")
+          cat("            with endogenous variables\n")
+          cat("              White standard errors\n")
+          cat("======================================================\n")
+          cat("======================================================\n")
+        }
+        else{
+          cat("======================================================\n")
+          cat("======================================================\n")
+          cat("               Spatial Durbin Model  \n")
+          cat("            with endogenous variables\n")
+          cat("======================================================\n")
+          cat("======================================================\n")
+        }
+      }
+      if(!isTRUE(x$Durbin) && !inherits(x$Durbin, "formula") && !x$HAC){
+        if(x$het){
+          cat("======================================================\n")
+          cat("======================================================\n")
+          cat("                Spatial Lag Model \n")
+          cat("            with endogenous variables\n")
+          cat("              White standard errors\n")
+          cat("======================================================\n")
+          cat("======================================================\n")
+        }
+        else{
+          cat("======================================================\n")
+          cat("======================================================\n")
+          cat("                Spatial Lag Model  \n")
+          cat("            with endogenous variables\n")
+          cat("======================================================\n")
+          cat("======================================================\n")
+        }
+        
+      }  
+    }
+  }
+  if(x$method =="gmm sarar"){
+    cat("====================================================\n")
+    cat("====================================================\n")
+    cat("               GS2SLS SARAR Model\n")
+    cat("====================================================\n")
+    cat("====================================================\n")
+  }
+} 
 			  
 	cat("\nCall:\n")
   print(x$call)
@@ -153,8 +410,6 @@ sumres <- function(x){
 #' @name print.sphet
 #' @aliases print.sphet
 #' @title print method for class sphet
-#' 
-#' 
 #' @description Method used to print objects of class \code{'summary.sphet'} and \code{'sphet'}
 #' 
 #' @usage \method{print}{sphet}(x, digits = max(3, getOption("digits") - 3),...)
